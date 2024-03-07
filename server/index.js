@@ -12,15 +12,16 @@ initApp(app).then(() => {
         extended: true,
         limit: '1mb'
     }));
-
     app.use(cors());
-
+    app.use((req, res, next) => {
+        console.log("Req url: ", req.path, " Body of the req: ", req.body);
+        next();
+    })
     app.get('/test', (req, res) => {
         return res.status(200).json({
             message: "Server is running fine!!!"
         })
     });
-
     app.use('/apis', apiRouter);
 
     app.use((req, res, next) => {
