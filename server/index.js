@@ -17,7 +17,7 @@ initApp(app).then(() => {
         console.log("Req url: ", req.path, " Body of the req: ", req.body);
         next();
     })
-    app.get('/test', (req, res) => {
+    app.get('/health', (req, res) => {
         return res.status(200).json({
             message: "Server is running fine!!!"
         })

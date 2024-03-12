@@ -5,21 +5,53 @@ const Scores = require('../../db/models/score');
 
 const getWeeklyRank = async ({ userId }) => {
     try {
-        const firstFriday = new Date(process.env.FIRST_FRIDAY);  // Replace with friday start date
-
-        const endDate = new Date();
-        let startDate = firstFriday;
-        while (startDate < endDate) {
-            startDate.setDate(startDate.getDate() + 7);
+        let rankResult = [];
+        const userDetails = await Users.findById({ _id: userId });
+        if (!userDetails) {
+            return {
+                error: true,
+                message: "user not found!!!"
+            }
         }
-        startDate.setDate(startDate.getDate() - 7);
-        console.log("Start date: ", startDate, " End date: ", endDate);
-
-        const rank = await Scores.aggregate([
+        const firstFriday = new Date(process.env.FIRST_FRIDAY);  // Replace with friday start date
+        let startDate = new Date(userDetails.createdAt);
+        while (firstFriday < startDate) {
+            firstFriday.setDate(firstFriday.getDate() + 7);
+        }
+        let endDate = firstFriday;
+        const now = new Date();
+        while (endDate < now) {
+            //calcualte rank of the selected week
+            console.log("Start Date: " + startDate + " End Date: " + endDate);
+            const rank = await Scores.aggregate([
+                {
+                    $match: {
+                        userId: { $exists: true },
+                        updatedAt: { $gte: startDate, $lt: endDate }
+                    }
+                }, {
+                    $group: {
+                        _id: {
+                            userId: '$userId'
+                        },
+                        totalScore: { $sum: '$score' }
+                    }
+                }, {
+                    $sort: {
+                        totalScore: -1
+                    }
+                }
+            ]);
+            rankResult.push(rank);
+            startDate = new Date(endDate);
+            endDate = new Date(endDate.setDate(endDate.getDate() + 7));
+        }
+        console.log("Start Date: " + startDate + " End Date: " + now);
+        let rank = await Scores.aggregate([
             {
                 $match: {
                     userId: { $exists: true },
-                    updatedAt: { $gte: startDate, $lt: endDate }
+                    updatedAt: { $gte: startDate, $lt: now }
                 }
             }, {
                 $group: {
@@ -33,27 +65,39 @@ const getWeeklyRank = async ({ userId }) => {
                     totalScore: -1
                 }
             }
-        ])
+        ]);
+        rankResult.push(rank);
 
-        console.log("Query result is: ", rank);
+        console.log("Rank result is: ", JSON.stringify(rankResult));
 
-        let resultIndex = undefined;
-        for (let index = 0; index < rank.length; index += 1) {
-            console.log("_id: ", rank[index]._id.userId.toString(), " userId: ", userId);
-            if (rank[index]._id.userId.toString() == userId.toString()) {
-                resultIndex = index + 1;
-                break;
+        let rankOfUser = [];
+        for (let i = 0; i < rankResult.length; i++) {
+            let resultIndex = undefined;
+            let rank = rankResult[i];
+            console.log("rank is: ", rank)
+            for (let index = 0; index < rank.length; index += 1) {
+                if (rank[index]._id.userId.toString() == userId.toString()) {
+                    resultIndex = index + 1;
+                    break;
+                }
             }
+            if (!resultIndex) {
+                rankOfUser.push({
+                    week: i + 1,
+                    userid: userId,
+                    rank: rank.length,
+                    score: 0
+                })
+                continue;
+            }
+            rankOfUser.push({
+                week: i + 1,
+                userId: rank[resultIndex - 1]._id?.userId,
+                rank: resultIndex,
+                score: rank[resultIndex - 1].totalScore
+            });
         }
-        console.log("Result index is: ", resultIndex);
-        if (!resultIndex) {
-            return "error"
-        }
-        return {
-            userId: rank[resultIndex - 1]._id.userId,
-            rank: resultIndex,
-            score: rank[resultIndex - 1].totalScore
-        };
+        return rankOfUser;
 
     } catch (error) {
         console.log(error);
@@ -139,13 +183,14 @@ const sendOtp = async ({ mobile }) => {
     const otp = 1234; //TODO: in realtime, generate random number
     try {
         const userExist = await Users.findOne({ mobile: mobile });
+        console.log("User found: ", userExist);
         if (userExist) {
             const updateUser = await Users.updateOne({
                 _id: userExist._id,
             }, {
                 // ...userExist,
-                otp: 1234,//TODO: in realtime, generate it randomaly
-                otpExpiry: new Date(new Date().getTime() + 120000)
+                otp: otp,//TODO: in realtime, generate it randomaly
+                otpExpiry: new Date(new Date().getTime() + 60000)
             });
             console.log("User updated: ", updateUser, "user: ", userExist);
             console.log("User already created, otp sent: ", userExist);
@@ -154,8 +199,7 @@ const sendOtp = async ({ mobile }) => {
         } else {
             const userCreate = await Users.create({
                 mobile: mobile,
-                otp: otp,
-                name: "Arvind"
+                otp: otp
             });
             console.log("User created: ", userCreate);
             return 'success';
@@ -188,7 +232,7 @@ const registerUser = async ({ mobile, dob, name, email, otp }) => {
                     return "OTP EXPIRED, Send otp again"
                 }
             } else {
-                return "erroe"
+                return "error"
             }
 
         } else {

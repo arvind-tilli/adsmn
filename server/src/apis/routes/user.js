@@ -5,6 +5,7 @@ const router = express.Router();
 router.post('/sendotp', async (req, res, next) => {
     try {
         const { mobile } = req.body;
+        console.log("here 🎉🎉")
         const response = await userController.sendOtp({ mobile });
         return res.status(200).json({
             success: true,
