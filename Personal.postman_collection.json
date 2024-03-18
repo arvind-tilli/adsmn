@@ -1,0 +1,196 @@
+{
+	"info": {
+		"_postman_id": "ef7e758d-38b8-43c8-961d-0dfcd62fca41",
+		"name": "Personal",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28488989"
+	},
+	"item": [
+		{
+			"name": "Adsmn",
+			"item": [
+				{
+					"name": "test server",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/test",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"test"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/apis/health",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"apis",
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "send otp",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"mobile\": \"9325860578\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/apis/users/sendotp",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"apis",
+								"users",
+								"sendotp"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"mobile\": \"9325860578\",\r\n    \"dob\": \"2001-03-03T14:43:45.723Z\",\r\n    \"name\": \"Arvind Sahu\",\r\n    \"email\": \"a@gmail.com\",\r\n    \"otp\": 1234\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/apis/users/register",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"apis",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Save Score",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userId\": \"65e4a95e91045b7102e99808\",\r\n    \"score\": 480\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/apis/score/save",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"apis",
+								"score",
+								"save"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Overall Rank",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/apis/score/rank/65e49122bda71e4d785dbc5f",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"apis",
+								"score",
+								"rank",
+								"65e49122bda71e4d785dbc5f"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Weekly Rank",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/apis/score/weeklyrank/65e4a95e91045b7102e99808",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"apis",
+								"score",
+								"weeklyrank",
+								"65e4a95e91045b7102e99808"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "test apis",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://35.154.250.246:4000/test",
+							"protocol": "https",
+							"host": [
+								"35",
+								"154",
+								"250",
+								"246"
+							],
+							"port": "4000",
+							"path": [
+								"test"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
